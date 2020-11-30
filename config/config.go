@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// ConfigPath is the path to the config file
 var ConfigPath string
 
 // InitializeConfiguration inits the base configuration of dispendium

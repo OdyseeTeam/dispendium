@@ -7,6 +7,7 @@ import (
 	"github.com/lbryio/lbry.go/v2/lbrycrd"
 )
 
+// Wallet an instance of a wallet that can be used by dispendium, equivalent to a lbrycrd instance running
 type Wallet struct {
 	*lbrycrd.Client
 	Name string
@@ -18,14 +19,17 @@ var loadedWallets []Wallet
 //chainParams chain parameters used in the application
 var chainParams *chaincfg.Params
 
+// SetChainParams sets the chain paramters used by dispendium for validating addresses and making calls to lbrycrd instances
 func SetChainParams(params *chaincfg.Params) {
 	chainParams = params
 }
 
+// GetCainParams retreives the chain params set on initialization
 func GetCainParams() *chaincfg.Params {
 	return chainParams
 }
 
+// AddWallet adds a wallet to the loaded wallets that are to be used by dispendium
 func AddWallet(name string, client *lbrycrd.Client) {
 	loadedWallets = append(loadedWallets, Wallet{
 		Client: client,
@@ -33,12 +37,14 @@ func AddWallet(name string, client *lbrycrd.Client) {
 	})
 }
 
+// Balance balance of a wallet instance used by dispendium
 type Balance struct {
 	Name    string  `json:"name"`
 	LBC     float64 `json:"lbc"`
 	Satoshi uint64  `json:"satoshi"`
 }
 
+// GetBalances retrieves the balances for all wallet instances used by dispendium
 func GetBalances() ([]Balance, error) {
 	var balances []Balance
 	for _, wallet := range loadedWallets {
@@ -56,11 +62,13 @@ func GetBalances() ([]Balance, error) {
 	return balances, nil
 }
 
+// WalletAccount accounts used by a wallet lbrycrd instance. It holds the available addresses for sending to dispendium
 type WalletAccount struct {
 	Name      string   `json:"name"`
 	Addresses []string `json:"addresses"`
 }
 
+// GetAddresses returns the set of addresses in use for each wallet lbrycrd instance loaded into dispendium
 func GetAddresses() ([]WalletAccount, error) {
 	var addresses []WalletAccount
 	for _, wallet := range loadedWallets {
