@@ -30,8 +30,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.3
-	github.com/volatiletech/inflect v0.0.0-20170731032912-e7201282ae8d // indirect
-	github.com/volatiletech/sqlboiler v3.4.0+incompatible
 	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
 	gopkg.in/ini.v1 v1.55.0 // indirect
 )
