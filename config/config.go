@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/lbryio/dispendium/wallets"
 	"strconv"
 
 	"github.com/lbryio/dispendium/jobs"
@@ -16,7 +17,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// InitializeConfiguration inits the base configuration of lighthouse
+// InitializeConfiguration inits the base configuration of dispendium
 func InitializeConfiguration() {
 	conf, err := env.NewWithEnvVars()
 	if err != nil {
@@ -32,7 +33,7 @@ func InitializeConfiguration() {
 	}
 	util.AuthToken = conf.AuthToken
 	initSlack(conf)
-	initLBRYCrdClient(conf)
+	initWallets(conf)
 	SetLBCConfig(conf)
 }
 
@@ -77,28 +78,22 @@ func initSlack(config *env.Config) {
 	}
 }
 
-func initLBRYCrdClient(conf *env.Config) {
+func initWallets(conf *env.Config) {
 	chainParams, ok := lbrycrd.ChainParamsMap[conf.BlockchainName]
 	if !ok {
 		logrus.Panicf("block chain name %s is not recognized", conf.BlockchainName)
 	}
-	if conf.LbrycrdURL != "" {
-		var lbrycrdClient *lbrycrd.Client
-		var err error
-		if conf.LbrycrdURL == "from_conf" {
-			lbrycrdClient, err = lbrycrd.NewWithDefaultURL(&chainParams)
-		} else {
-			lbrycrdClient, err = lbrycrd.New(conf.LbrycrdURL, &chainParams)
-		}
+	wallets.SetChainParams(&chainParams)
+	instances := viper.GetStringMapString("lbrycrd")
+	for name, url := range instances {
+		lbrycrdClient, err := lbrycrd.New(url, &chainParams)
 		if err != nil {
 			panic(err)
 		}
-		util.LbrycrdClient = lbrycrdClient
-		util.ChainParams = &chainParams
-
 		_, err = lbrycrdClient.GetBalance("*")
 		if err != nil {
 			logrus.Panicf("Error connecting to lbrycrd: %+v", err)
 		}
+		wallets.AddWallet(name, lbrycrdClient)
 	}
 }

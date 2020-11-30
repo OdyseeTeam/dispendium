@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"github.com/lbryio/dispendium/wallets"
 	"net/http"
 	"time"
 
@@ -76,12 +77,12 @@ func Send(r *http.Request) api.Response {
 	if err := withinLBCLimits(); err != nil {
 		return api.Response{Error: errors.Err(err)}
 	}
-	decodedAddress, err := lbrycrd.DecodeAddress(params.WalletAddress, util.ChainParams)
+	decodedAddress, err := lbrycrd.DecodeAddress(params.WalletAddress, wallets.GetCainParams())
 	if err != nil {
 		return api.Response{Error: errors.Err("could not decode wallet address, please check network and chain: ", err)}
 	}
 	amount := btcutil.Amount(params.SatoshiAmount)
-	txHash, err := util.LbrycrdClient.SendToAddress(decodedAddress, amount)
+	txHash, err := wallets.ChooseWallet().SendToAddress(decodedAddress, amount)
 	if err != nil {
 		return api.Response{Error: errors.Err(err)}
 	}
@@ -118,12 +119,7 @@ func withinLBCLimits() error {
 	return nil
 }
 
-type balance struct {
-	LBC     float64 `json:"lbc"`
-	Satoshi uint64  `json:"satoshi"`
-}
-
-// Balance Handler returns lbrycrd available balance
+// Balance Handler returns lbrycrd wallet available balances
 func Balance(r *http.Request) api.Response {
 	if r.Method != http.MethodPost {
 		return api.Response{Error: errors.Err("invalid method"), Status: http.StatusMethodNotAllowed}
@@ -142,16 +138,10 @@ func Balance(r *http.Request) api.Response {
 		logrus.Warningf("Login with incorrect token %s", params.AuthToken)
 		return api.Response{Error: errors.Err("not authorized"), Status: http.StatusUnauthorized}
 	}
-
-	available, err := util.LbrycrdClient.GetBalanceMinConf("*", 1)
+	balances, err := wallets.GetBalances()
 	if err != nil {
-		return api.Response{Error: errors.Err(err)}
+		return api.Response{Error: err}
 	}
 
-	balance := &balance{
-		LBC:     available.ToBTC(),
-		Satoshi: uint64(available),
-	}
-
-	return api.Response{Data: balance}
+	return api.Response{Data: balances}
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/lbryio/dispendium/config"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -10,6 +11,7 @@ import (
 )
 
 func init() {
+	cobra.OnInitialize(config.InitializeConfiguration)
 	rootCmd.PersistentFlags().BoolP("debugmode", "d", false, "turns on debug mode for the application command.")
 	rootCmd.PersistentFlags().BoolP("tracemode", "t", false, "turns on trace mode for the application command, very verbose logging.")
 	err := viper.BindPFlags(rootCmd.PersistentFlags())
@@ -20,7 +22,7 @@ func init() {
 
 var rootCmd = &cobra.Command{
 	Use:   "dispendium",
-	Short: "Dispenses LBC for LBRY Inc",
+	Short: "Dispenses Reward LBC for LBRY Inc",
 	Long:  `Recieves requests from authorized sources to send LBC to an address`,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

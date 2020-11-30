@@ -1,0 +1,7 @@
+version: "3"
+services:
+  dispendium:
+    image: lbry/dispendium
+    network_mode: "host"
+    ports:
+      - "7070:7070"

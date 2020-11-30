@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/lbryio/dispendium/actions"
-	"github.com/lbryio/dispendium/config"
 	"github.com/lbryio/dispendium/jobs"
 
 	"github.com/pkg/profile"
@@ -17,7 +16,7 @@ import (
 
 func init() {
 	serveCmd.PersistentFlags().StringP("host", "", "0.0.0.0", "host to listen on")
-	serveCmd.PersistentFlags().IntP("port", "p", 6060, "port binding used for the api server")
+	serveCmd.PersistentFlags().IntP("port", "p", 7070, "port binding used for the api server")
 	//Bind to Viper
 	err := viper.BindPFlag("host", serveCmd.PersistentFlags().Lookup("host"))
 	if err != nil {
@@ -39,7 +38,6 @@ var serveCmd = &cobra.Command{
 		if viper.GetBool("codeprofile") {
 			defer profile.Start(profile.NoShutdownHook).Stop()
 		}
-		config.InitializeConfiguration()
 		routes := actions.GetRoutes()
 		httpServeMux := http.NewServeMux()
 		httpServeMux.Handle(promPath, promBasicAuthWrapper(promhttp.Handler()))
