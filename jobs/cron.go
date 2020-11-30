@@ -1,8 +1,7 @@
 package jobs
 
 import (
-	"github.com/lbryio/dispendium/util"
-	"github.com/lbryio/lbry.go/v2/extras/errors"
+	"github.com/lbryio/dispendium/wallets"
 
 	"github.com/jasonlvhit/gocron"
 	"github.com/sirupsen/logrus"
@@ -36,13 +35,17 @@ func Shutdown() {
 
 //WalletBalanceCheck checks the wallet balance and warns when its too low via warning
 func WalletBalanceCheck() {
-	balance, err := util.LbrycrdClient.GetBalance("*")
+	balances, err := wallets.GetBalances()
 	if err != nil {
-		logrus.Error(errors.Prefix("wallet_balance_check: ", err))
+		logrus.Error(err)
 		return
 	}
-	if balance.ToBTC() < MinLBCBalance {
-		CreditBalanceLogger.Warningf("ALERT: Dispendium balance(%.2f) is below the min balance of %.2f", balance.ToBTC(), MinLBCBalance)
-		logrus.Warningf("ALERT: balance(%.2f) is below the min balance of %.2f", balance.ToBTC(), MinLBCBalance)
+	for _, balance := range balances {
+		if balance.LBC < MinLBCBalance {
+			if CreditBalanceLogger != nil {
+				CreditBalanceLogger.Warningf("ALERT: Dispendium balance(%.2f) is below the min balance of %.2f", balance.LBC, MinLBCBalance)
+			}
+			logrus.Warningf("ALERT: balance(%.2f) is below the min balance of %.2f", balance.LBC, MinLBCBalance)
+		}
 	}
 }

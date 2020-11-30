@@ -55,3 +55,25 @@ func GetBalances() ([]Balance, error) {
 	}
 	return balances, nil
 }
+
+type WalletAccount struct {
+	Name      string   `json:"name"`
+	Addresses []string `json:"addresses"`
+}
+
+func GetAddresses() ([]WalletAccount, error) {
+	var addresses []WalletAccount
+	for _, wallet := range loadedWallets {
+		address := WalletAccount{Name: wallet.Name}
+		accounts, err := wallet.GetAddressesByAccount("")
+		if err != nil {
+			return nil, errors.Err(err)
+		}
+		for _, account := range accounts {
+			println("Account: ", account)
+			address.Addresses = append(address.Addresses, account.String())
+		}
+		addresses = append(addresses, address)
+	}
+	return addresses, nil
+}

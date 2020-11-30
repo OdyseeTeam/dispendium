@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/lbryio/dispendium/config"
 	"os"
+
+	"github.com/lbryio/dispendium/config"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ func init() {
 	cobra.OnInitialize(config.InitializeConfiguration)
 	rootCmd.PersistentFlags().BoolP("debugmode", "d", false, "turns on debug mode for the application command.")
 	rootCmd.PersistentFlags().BoolP("tracemode", "t", false, "turns on trace mode for the application command, very verbose logging.")
+	rootCmd.PersistentFlags().StringVar(&config.ConfigPath, "config", "", "config path when non-default")
 	err := viper.BindPFlags(rootCmd.PersistentFlags())
 	if err != nil {
 		logrus.Panic(err)

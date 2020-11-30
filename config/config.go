@@ -1,21 +1,24 @@
 package config
 
 import (
-	"github.com/lbryio/dispendium/wallets"
+	"fmt"
 	"strconv"
-
-	"github.com/lbryio/dispendium/jobs"
 
 	"github.com/lbryio/dispendium/actions"
 	"github.com/lbryio/dispendium/env"
+	"github.com/lbryio/dispendium/jobs"
 	"github.com/lbryio/dispendium/util"
+	"github.com/lbryio/dispendium/wallets"
 
 	"github.com/lbryio/lbry.go/v2/lbrycrd"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/johntdyer/slackrus"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
+
+var ConfigPath string
 
 // InitializeConfiguration inits the base configuration of dispendium
 func InitializeConfiguration() {
@@ -32,6 +35,12 @@ func InitializeConfiguration() {
 		logrus.SetLevel(logrus.TraceLevel)
 	}
 	util.AuthToken = conf.AuthToken
+	readConfig()
+	viper.WatchConfig()
+	viper.OnConfigChange(func(in fsnotify.Event) {
+		fmt.Println("Config file changed:", in.Name)
+		readConfig()
+	})
 	initSlack(conf)
 	initWallets(conf)
 	SetLBCConfig(conf)
@@ -85,6 +94,9 @@ func initWallets(conf *env.Config) {
 	}
 	wallets.SetChainParams(&chainParams)
 	instances := viper.GetStringMapString("lbrycrd")
+	if len(instances) == 0 {
+		logrus.Panic("No lbrycrd instances found in config to connect to")
+	}
 	for name, url := range instances {
 		lbrycrdClient, err := lbrycrd.New(url, &chainParams)
 		if err != nil {
@@ -95,5 +107,17 @@ func initWallets(conf *env.Config) {
 			logrus.Panicf("Error connecting to lbrycrd: %+v", err)
 		}
 		wallets.AddWallet(name, lbrycrdClient)
+	}
+}
+
+func readConfig() {
+	viper.SetConfigName("dispendium")                // name of config file (without extension)
+	viper.AddConfigPath(viper.GetString(ConfigPath)) // 1 - commandline config path
+	viper.AddConfigPath("$HOME/")                    // 2 - check $HOME
+	viper.AddConfigPath(".")                         // 3 - optionally look for config in the working directory
+	viper.AddConfigPath("./config/default/")         // 4 - use default that comes with the branch
+	err := viper.ReadInConfig()                      // Find and read the config file
+	if err != nil {                                  // Handle errors reading the config file
+		logrus.Warning("Error reading config file...defaults will be used: ", err)
 	}
 }

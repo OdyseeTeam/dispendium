@@ -1,5 +1,2 @@
 lbrycrd:
-  A: "rpc://lbry:lbry@localhost:9345"
-  B: "rpc://lbry:lbry@localhost:9445"
-  C: "rpc://lbry:lbry@localhost:9545"
-  D: "rpc://lbry:lbry@localhost:9645"
+  local: "rpc://lbry:lbry@localhost:9245"

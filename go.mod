@@ -9,7 +9,7 @@ require (
 	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/fatih/color v1.7.0
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/jasonlvhit/gocron v0.0.0-20191228163020-98b59b546dee
 	github.com/johntdyer/slack-go v0.0.0-20180213144715-95fac1160b22 // indirect
 	github.com/johntdyer/slackrus v0.0.0-20180518184837-f7aae3243a07

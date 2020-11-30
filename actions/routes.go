@@ -38,6 +38,7 @@ func GetRoutes() *Routes {
 
 	routes.set("/send", Send)
 	routes.set("/balance", Balance)
+	routes.set("/addresses", Addresses)
 
 	return &routes
 }
