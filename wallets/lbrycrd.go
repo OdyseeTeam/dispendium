@@ -73,13 +73,12 @@ func GetAddresses() ([]WalletAccount, error) {
 	var addresses []WalletAccount
 	for _, wallet := range loadedWallets {
 		address := WalletAccount{Name: wallet.Name}
-		accounts, err := wallet.GetAddressesByAccount("")
+		results, err := wallet.ListReceivedByAddressIncludeEmpty(0, true)
 		if err != nil {
 			return nil, errors.Err(err)
 		}
-		for _, account := range accounts {
-			println("Account: ", account)
-			address.Addresses = append(address.Addresses, account.String())
+		for _, account := range results {
+			address.Addresses = append(address.Addresses, account.Address)
 		}
 		addresses = append(addresses, address)
 	}

@@ -1,2 +1,3 @@
 lbrycrd:
   local: "rpc://lbry:lbry@localhost:9245"
+#  local: "rpc://lbry:lbry@docker-host:9245"

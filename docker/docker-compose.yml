@@ -2,6 +2,17 @@ version: "3"
 services:
   dispendium:
     image: lbry/dispendium:master
-    network_mode: "host"
+    depends_on:
+      - docker-host
     ports:
       - "7070:7070"
+    environment:
+      - AUTH_TOKEN=MyToken
+    volumes:
+      - "./../config/default/dispendium.yaml:/root/dispendium.yaml"
+    entrypoint: ./dispendium serve -d
+  docker-host:
+    #This allows connection to your local lbrycrd instance
+    image: qoomon/docker-host
+    cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
+    restart: on-failure
