@@ -40,12 +40,23 @@ func WalletBalanceCheck() {
 		logrus.Error(err)
 		return
 	}
+	addresses, err := wallets.GetAddresses()
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+	addrMap := make(map[string]string)
+	for _, addressList := range addresses {
+		for _, addy := range addressList.Addresses {
+			addrMap[addressList.Name] = addy
+		}
+	}
 	for _, balance := range balances {
 		if balance.LBC < MinLBCBalance {
 			if CreditBalanceLogger != nil {
-				CreditBalanceLogger.Warningf("ALERT: Dispendium balance(%.2f) is below the min balance of %.2f", balance.LBC, MinLBCBalance)
+				CreditBalanceLogger.Warningf("ALERT: Dispendium balance(%.2f) is below the min balance of %.2f for %s - %s", balance.LBC, MinLBCBalance, balance.Name, addrMap[balance.Name])
 			}
-			logrus.Warningf("ALERT: balance(%.2f) is below the min balance of %.2f", balance.LBC, MinLBCBalance)
+			logrus.Warningf("ALERT: Dispendium balance(%.2f) is below the min balance of %.2f for %s - %s", balance.LBC, MinLBCBalance, balance.Name, addrMap[balance.Name])
 		}
 	}
 }
