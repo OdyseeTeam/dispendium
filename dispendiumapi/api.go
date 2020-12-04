@@ -92,7 +92,7 @@ type BalanceResponse struct {
 	Trace   []string        `json:"_trace,omitempty"`
 }
 
-// Balances sends funds to an address
+// Balance sends funds to an address
 func (c Client) Balance() (*BalanceResponse, error) {
 	formData := url.Values{}
 	formData.Add("auth_token", c.token)
