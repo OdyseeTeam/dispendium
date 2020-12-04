@@ -75,3 +75,42 @@ func (c Client) SendFunds(args SendFundsArgs) (*SendFundsResponse, error) {
 	}
 	return sfresp, nil
 }
+
+// BalanceResult result from the api call to send funds
+type BalanceResult struct {
+	Name    string  `json:"name"`
+	LBC     float64 `json:"lbc"`
+	Satoshi uint64  `json:"satoshi"`
+}
+
+// BalanceResponse response from the api call. It includes the http response plus the result
+type BalanceResponse struct {
+	*http.Response
+	Success bool            `json:"success"`
+	Error   *string         `json:"error"`
+	Data    []BalanceResult `json:"data"`
+	Trace   []string        `json:"_trace,omitempty"`
+}
+
+// Balances sends funds to an address
+func (c Client) Balance() (*BalanceResponse, error) {
+	formData := url.Values{}
+	formData.Add("auth_token", c.token)
+	resp, err := c.PostForm(c.url+"/balance", formData)
+	if err != nil {
+		return nil, errors.Err(err)
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			logrus.Error(err)
+		}
+	}()
+
+	sfresp := &BalanceResponse{}
+	err = json.NewDecoder(resp.Body).Decode(sfresp)
+	if err != nil {
+		return nil, errors.Err(err)
+	}
+	return sfresp, nil
+}

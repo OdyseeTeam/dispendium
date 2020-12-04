@@ -2,6 +2,7 @@ package wallets
 
 import (
 	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/lbryio/dispendium/dispendiumapi"
 	"github.com/lbryio/lbry.go/v2/extras/errors"
 
 	"github.com/lbryio/lbry.go/v2/lbrycrd"
@@ -37,23 +38,16 @@ func AddWallet(name string, client *lbrycrd.Client) {
 	})
 }
 
-// Balance balance of a wallet instance used by dispendium
-type Balance struct {
-	Name    string  `json:"name"`
-	LBC     float64 `json:"lbc"`
-	Satoshi uint64  `json:"satoshi"`
-}
-
 // GetBalances retrieves the balances for all wallet instances used by dispendium
-func GetBalances() ([]Balance, error) {
-	var balances []Balance
+func GetBalances() ([]dispendiumapi.BalanceResult, error) {
+	var balances []dispendiumapi.BalanceResult
 	for _, wallet := range loadedWallets {
 		available, err := wallet.GetBalanceMinConf("*", 1)
 		if err != nil {
 			return nil, errors.Err(err)
 		}
 
-		balances = append(balances, Balance{
+		balances = append(balances, dispendiumapi.BalanceResult{
 			Name:    wallet.Name,
 			LBC:     available.ToBTC(),
 			Satoshi: uint64(available),
