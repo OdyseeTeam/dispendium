@@ -76,8 +76,10 @@ func Send(r *http.Request) api.Response {
 		return api.Response{Error: errors.Err("could not decode wallet address, please check network and chain: ", err)}
 	}
 	amount := btcutil.Amount(params.SatoshiAmount)
-	txHash, err := wallets.ChooseWallet().SendToAddress(decodedAddress, amount)
+	wallet := wallets.ChooseWallet()
+	txHash, err := wallet.SendToAddress(decodedAddress, amount)
 	if err != nil {
+		wallets.RemoveWallet(wallet)
 		return api.Response{Error: errors.Err(err)}
 	}
 

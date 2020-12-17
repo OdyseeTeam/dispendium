@@ -78,3 +78,13 @@ func GetAddresses() ([]WalletAccount, error) {
 	}
 	return addresses, nil
 }
+
+func RemoveWallet(w *Wallet) {
+	var newSet []Wallet
+	for _, wallet := range loadedWallets {
+		if wallet.Name != w.Name {
+			newSet = append(newSet, wallet)
+		}
+	}
+	loadedWallets = newSet
+}

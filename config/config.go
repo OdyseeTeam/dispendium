@@ -105,7 +105,8 @@ func initWallets(conf *env.Config) {
 		}
 		_, err = lbrycrdClient.GetBalance("*")
 		if err != nil {
-			logrus.Panicf("Error connecting to lbrycrd: %+v", err)
+			logrus.Errorf("Error connecting to lbrycrd: %+v", err)
+			continue
 		}
 		wallets.AddWallet(name, lbrycrdClient)
 	}
