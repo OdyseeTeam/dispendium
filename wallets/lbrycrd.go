@@ -79,6 +79,7 @@ func GetAddresses() ([]WalletAccount, error) {
 	return addresses, nil
 }
 
+// RemoveWallet removes a wallet from rotation!
 func RemoveWallet(w *Wallet) {
 	var newSet []Wallet
 	for _, wallet := range loadedWallets {
