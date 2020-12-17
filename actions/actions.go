@@ -77,7 +77,7 @@ func Send(r *http.Request) api.Response {
 	}
 	amount := btcutil.Amount(params.SatoshiAmount)
 	wallet, err := wallets.ChooseWallet()
-	if err == nil {
+	if err != nil {
 		return api.Response{Error: err}
 	}
 	txHash, err := wallet.SendToAddress(decodedAddress, amount)
