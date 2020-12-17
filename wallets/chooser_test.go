@@ -15,7 +15,10 @@ func TestChooseWallet(t *testing.T) {
 	AddWallet("c", &lbrycrd.Client{})
 
 	for i := 0; i < 100; i++ {
-		wallet := ChooseWallet()
+		wallet, err := ChooseWallet()
+		if err != nil {
+			t.Fatal(err)
+		}
 		if wallet == nil {
 			t.Error("no wallet!")
 		}
