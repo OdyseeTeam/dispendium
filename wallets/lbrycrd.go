@@ -42,7 +42,7 @@ func AddWallet(name string, client *lbrycrd.Client) {
 func GetBalances() ([]dispendiumapi.BalanceResult, error) {
 	var balances []dispendiumapi.BalanceResult
 	for _, wallet := range loadedWallets {
-		available, err := wallet.GetBalanceMinConf("*", 1)
+		available, err := wallet.GetBalanceMinConf("*", 0)
 		if err != nil {
 			return nil, errors.Err(err)
 		}
