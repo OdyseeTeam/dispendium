@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -82,6 +83,7 @@ func Send(r *http.Request) api.Response {
 	}
 	txHash, err := wallet.SendToAddress(decodedAddress, amount)
 	if err != nil {
+		logrus.Warn(errors.Prefix(fmt.Sprintf("Removing wallet instance %s due to ", wallet.Name), errors.Err(err)))
 		wallets.RemoveWallet(wallet)
 		return api.Response{Error: errors.Err(err)}
 	}
