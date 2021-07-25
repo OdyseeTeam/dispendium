@@ -80,7 +80,7 @@ func Send(r *http.Request) api.Response {
 	if err != nil {
 		return api.Response{Error: err}
 	}
-	txHash, err := wallet.SendToAddress(decodedAddress, amount)
+	txHash, err := wallet.Send(decodedAddress, amount)
 	if err != nil {
 		logrus.Warn(errors.Prefix(fmt.Sprintf("Removing wallet instance %s due to error sending %g to %s: ", wallet.Name, amount.ToBTC(), decodedAddress.String()), errors.Err(err)))
 		wallets.RemoveWallet(wallet)

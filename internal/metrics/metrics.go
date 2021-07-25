@@ -33,6 +33,7 @@ var (
 		Help:      "Tracks the durations for an api",
 	}, []string{"api"})
 
+	// Balance tracks the balance of each wallet whenever we call get balance.
 	Balance = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "dispendium",
 		Subsystem: "lbrycrd",
@@ -41,11 +42,13 @@ var (
 	}, []string{"instance"})
 )
 
+// SendDuration logs the time it takes to send with the respective metric
 func SendDuration(start time.Time, instance string) {
 	duration := time.Since(start).Seconds()
 	sendDur.WithLabelValues(instance).Observe(duration)
 }
 
+// APIDuration logs the time it takes to complete the api with the respective metric
 func APIDuration(start time.Time, api string) {
 	duration := time.Since(start).Seconds()
 	apiDuration.WithLabelValues(api).Observe(duration)
