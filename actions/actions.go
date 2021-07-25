@@ -38,7 +38,7 @@ func Root(r *http.Request) api.Response {
 }
 
 // Test Handler can be used for testing and triggering
-func Test(r *http.Request) api.Response {
+func Test(_ *http.Request) api.Response {
 	return api.Response{Data: "ok"}
 }
 
@@ -47,8 +47,7 @@ func Send(r *http.Request) api.Response {
 	if r.Method != http.MethodPost && !util.Debugging {
 		return api.Response{Error: errors.Err("invalid method"), Status: http.StatusMethodNotAllowed}
 	}
-	start := time.Now()
-	defer metrics.SendAPI.WithLabelValues("duration").Observe(time.Since(start).Seconds())
+	defer metrics.APIDuration(time.Now(), "send")
 	params := struct {
 		AuthToken     string
 		WalletAddress string
@@ -88,10 +87,6 @@ func Send(r *http.Request) api.Response {
 		return api.Response{Error: errors.Err(err)}
 	}
 
-	if err != nil {
-		return api.Response{Error: errors.Err(err)}
-	}
-	metrics.SendAPI.WithLabelValues("amount").Observe(util.LBC(uint64(params.SatoshiAmount)))
 	logrus.Debugf("Sending %.2f LBC to %s", util.LBC(uint64(params.SatoshiAmount)), params.WalletAddress)
 	return api.Response{Data: dispendiumapi.SendResult{
 		LBCAmount:     util.LBC(uint64(params.SatoshiAmount)),
@@ -119,6 +114,7 @@ func Balance(r *http.Request) api.Response {
 		logrus.Warningf("Login with incorrect token %s", params.AuthToken)
 		return api.Response{Error: errors.Err("not authorized"), Status: http.StatusUnauthorized}
 	}
+	defer metrics.APIDuration(time.Now(), "balance")
 	balances, err := wallets.GetBalances()
 	if err != nil {
 		return api.Response{Error: err}
@@ -146,6 +142,7 @@ func Addresses(r *http.Request) api.Response {
 		logrus.Warningf("Login with incorrect token %s", params.AuthToken)
 		return api.Response{Error: errors.Err("not authorized"), Status: http.StatusUnauthorized}
 	}
+	defer metrics.APIDuration(time.Now(), "addresses")
 	addresses, err := wallets.GetAddresses()
 	if err != nil {
 		return api.Response{Error: err}

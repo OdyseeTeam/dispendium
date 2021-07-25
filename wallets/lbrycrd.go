@@ -1,8 +1,13 @@
 package wallets
 
 import (
+	"time"
+
 	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/btcsuite/btcutil"
 	"github.com/lbryio/dispendium/dispendiumapi"
+	"github.com/lbryio/dispendium/internal/metrics"
 	"github.com/lbryio/lbry.go/v2/extras/errors"
 
 	"github.com/lbryio/lbry.go/v2/lbrycrd"
@@ -46,7 +51,7 @@ func GetBalances() ([]dispendiumapi.BalanceResult, error) {
 		if err != nil {
 			return nil, errors.Err(err)
 		}
-
+		metrics.Balance.WithLabelValues(wallet.Name).Set(available.ToBTC())
 		balances = append(balances, dispendiumapi.BalanceResult{
 			Name:    wallet.Name,
 			LBC:     available.ToBTC(),
@@ -88,4 +93,10 @@ func RemoveWallet(w *Wallet) {
 		}
 	}
 	loadedWallets = newSet
+}
+
+func (c *Wallet) SendToAddress(address btcutil.Address, amount btcutil.Amount) (*chainhash.Hash, error) {
+	defer metrics.SendDuration(time.Now(), c.Name)
+	defer metrics.SendAmount.WithLabelValues(c.Name).Observe(amount.ToBTC())
+	return c.Client.SendToAddress(address, amount)
 }
