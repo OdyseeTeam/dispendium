@@ -97,6 +97,8 @@ func RemoveWallet(w *Wallet) {
 
 // Send overrides the SendToAddress of the client to handle extra logic before the call.
 func (c *Wallet) Send(address btcutil.Address, amount btcutil.Amount) (*chainhash.Hash, error) {
+	metrics.Sending.WithLabelValues(c.Name).Inc()
+	defer metrics.Sending.WithLabelValues(c.Name).Dec()
 	defer metrics.SendDuration(time.Now(), c.Name)
 	defer metrics.SendAmount.WithLabelValues(c.Name).Observe(amount.ToBTC())
 	return c.Client.SendToAddress(address, amount)

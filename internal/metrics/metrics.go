@@ -9,7 +9,7 @@ import (
 
 var (
 
-	//SendAmount tracks metrics related to Send API of dispendium. It tracks the spending output.
+	// SendAmount tracks metrics related to Send API of dispendium. It tracks the spending output.
 	SendAmount = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "dispendium",
 		Subsystem: "sending",
@@ -17,7 +17,7 @@ var (
 		Help:      "Tracks the send amounts for the api",
 	}, []string{"instance"})
 
-	//sendDur tracks metrics related to Send API of Dispendium. It tracks how long it takes for the sending to complete.
+	// sendDur tracks metrics related to Send API of Dispendium. It tracks how long it takes for the sending to complete.
 	sendDur = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "dispendium",
 		Subsystem: "sending",
@@ -25,7 +25,15 @@ var (
 		Help:      "Tracks the send durations for the api",
 	}, []string{"instance"})
 
-	//apiDuration It tracks how long it takes for the api's of Dispendium to complete.
+	// Sending tracks the number of active sends from lbrycrd at a time
+	Sending = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "dispendium",
+		Subsystem: "sending",
+		Name:      "now",
+		Help:      "number active sends happening now",
+	}, []string{"instance"})
+
+	// apiDuration It tracks how long it takes for the api's of Dispendium to complete.
 	apiDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "dispendium",
 		Subsystem: "api",
